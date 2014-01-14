@@ -1,5 +1,8 @@
-require "scraperwiki/morph/version"
+require "scraperwiki-morph/version"
+require "scraperwiki"
 
 module ScraperWikiMorph
-  # Your code goes here...
+  def self.save_sqlite(unique_keys, data)
+    ScraperWiki.save_sqlite(unique_keys, data, "data")
+  end
 end
