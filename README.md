@@ -1,4 +1,4 @@
-# Scraperwiki::Morph
+# ScraperWikiMorph
 
 TODO: Write a gem description
 

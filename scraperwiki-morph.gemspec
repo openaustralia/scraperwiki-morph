@@ -1,13 +1,13 @@
 # coding: utf-8
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'scraperwiki/morph/version'
+require 'scraperwiki-morph/version'
 
 Gem::Specification.new do |spec|
   spec.name          = "scraperwiki-morph"
-  spec.version       = Scraperwiki::Morph::VERSION
+  spec.version       = ScraperWikiMorph::VERSION
   spec.authors       = ["Matthew Landauer"]
-  spec.email         = ["matthew@openaustralia.org"]
+  spec.email         = ["matthew@oaf.org.au"]
   spec.description   = %q{TODO: Write a gem description}
   spec.summary       = %q{TODO: Write a gem summary}
   spec.homepage      = ""
