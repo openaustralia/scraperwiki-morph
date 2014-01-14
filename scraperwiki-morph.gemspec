@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["matthew@oaf.org.au"]
   spec.description   = "ScraperWiki Morph"
   spec.summary       = "ScraperWiki / Morph compatibility gem"
-  spec.homepage      = ""
+  spec.homepage      = "https://github.com/openaustralia/scraperwiki-morph"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files`.split($/)
