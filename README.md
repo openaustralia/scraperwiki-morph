@@ -1,3 +1,5 @@
+[![Gem Version](https://badge.fury.io/rb/scraperwiki-morph.png)](http://badge.fury.io/rb/scraperwiki-morph)
+
 # ScraperWikiMorph
 
 TODO: Write a gem description
