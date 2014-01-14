@@ -2,7 +2,10 @@ require "scraperwiki-morph/version"
 require "scraperwiki"
 
 module ScraperWikiMorph
-  def self.save_sqlite(unique_keys, data, table = "data", verbose = 0)
+  DEFAULT_TABLE = 'data'
+  DEFAULT_DATABASE = 'data.sqlite'
+
+  def self.save_sqlite(unique_keys, data, table = DEFAULT_TABLE, verbose = 0)
     set_database
     ScraperWiki.save_sqlite(unique_keys, data, table, verbose)
   end
@@ -13,6 +16,6 @@ module ScraperWikiMorph
   end
 
   def self.set_database
-    ScraperWiki.config={db: 'data.sqlite'}
+    ScraperWiki.config={db: DEFAULT_DATABASE}
   end
 end
