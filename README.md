@@ -2,7 +2,9 @@
 
 # ScraperWikiMorph
 
-TODO: Write a gem description
+A simple compatibility layer so that you can use something that looks almost the same as the [ScraperWiki gem](http://rubygems.org/gems/scraperwiki) - the only real difference is that it writes to an sqlite database called `data.sqlite` (rather than ScraperWiki's default `scraperwiki.sqlite`) and a table called `data` (rather than ScraperWiki's default `swdata`)
+
+This makes it very easy to transition scraper code from ScraperWiki to [Morph](http://morph.io)
 
 ## Installation
 
