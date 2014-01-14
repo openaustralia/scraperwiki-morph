@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.version       = ScraperWikiMorph::VERSION
   spec.authors       = ["Matthew Landauer"]
   spec.email         = ["matthew@oaf.org.au"]
-  spec.description   = %q{TODO: Write a gem description}
-  spec.summary       = %q{TODO: Write a gem summary}
+  spec.description   = "ScraperWiki Morph"
+  spec.summary       = "ScraperWiki / Morph compatibility gem"
   spec.homepage      = ""
   spec.license       = "MIT"
 
