@@ -23,4 +23,19 @@ describe ScraperWikiMorph do
       ScraperWikiMorph.save_sqlite(unique_keys, data, table, verbose)
     end
   end
+
+  describe ".save_var" do
+    it "should delegate everything else to ScraperWiki" do
+      ScraperWiki.should_receive(:config=).with({db: "data.sqlite"})
+      ScraperWiki.should_receive(:save_var).with('current', 100)
+      ScraperWikiMorph.save_var('current', 100)
+    end
+  end
+
+  describe ".select" do
+    it "should delegate everything else to ScraperWiki" do
+      ScraperWiki.should_receive(:select).with("select * from data")
+      ScraperWikiMorph.select("select * from data")
+    end
+  end
 end
