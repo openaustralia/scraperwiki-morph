@@ -1,0 +1,57 @@
+name: Release
+
+# Publishes the gem to RubyGems.org via trusted publishing (OIDC) whenever a
+# version bump lands on main. rubygems/release-gem runs `rake release`, which
+# builds the gem, tags the release (vX.Y.Z), pushes the tag and pushes the gem.
+#
+# One-time setup required on rubygems.org and GitHub before this works - see
+# "Releasing a new version" in the README.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - lib/scraperwiki-morph/version.rb
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Publish to RubyGems.org
+    runs-on: ubuntu-latest
+    environment: rubygems
+    permissions:
+      contents: write # required for `rake release` to push the release tag
+      id-token: write # mandatory for RubyGems trusted publishing
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+
+      - name: Check whether this version is already on RubyGems.org
+        id: check
+        run: |
+          version=$(ruby -r ./lib/scraperwiki-morph/version -e 'puts ScraperWikiMorph::VERSION')
+          published=$(curl -sf https://rubygems.org/api/v1/versions/scraperwiki-morph.json \
+            | jq --arg v "$version" 'any(.[]; .number == $v)')
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "published=$published" >> "$GITHUB_OUTPUT"
+          echo "scraperwiki-morph $version already published: $published"
+
+      - name: Release gem
+        if: steps.check.outputs.published == 'false'
+        uses: rubygems/release-gem@v1
+
+      - name: Skip release
+        if: steps.check.outputs.published != 'false'
+        run: echo "scraperwiki-morph ${{ steps.check.outputs.version }} is already on RubyGems.org; nothing to publish."
