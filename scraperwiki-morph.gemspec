@@ -16,7 +16,7 @@ Gem::Specification.new do |spec|
   spec.files         = `git ls-files`.split($/)
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
-  spec.required_ruby_version = ">= 3.3"
+  spec.required_ruby_version = ">= 3.2"
 
   spec.add_dependency "scraperwiki", "~> 3.0"
 end
