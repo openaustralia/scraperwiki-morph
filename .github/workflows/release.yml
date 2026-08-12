@@ -38,12 +38,43 @@ jobs:
         with:
           bundler-cache: true
 
+      # A failed lookup must never be mistaken for "already published" - that
+      # would skip the release silently and, because this workflow only runs on
+      # changes to version.rb, nothing would re-trigger it. Anything other than
+      # a definitive answer fails the job instead.
       - name: Check whether this version is already on RubyGems.org
         id: check
+        shell: bash
         run: |
           version=$(ruby -r ./lib/scraperwiki-morph/version -e 'puts ScraperWikiMorph::VERSION')
-          published=$(curl -sf https://rubygems.org/api/v1/versions/scraperwiki-morph.json \
-            | jq --arg v "$version" 'any(.[]; .number == $v)')
+          body=$(mktemp)
+
+          if ! status=$(curl -sS --retry 3 --retry-delay 2 --connect-timeout 10 --max-time 30 \
+            -o "$body" -w '%{http_code}' \
+            https://rubygems.org/api/v1/versions/scraperwiki-morph.json); then
+            echo "::error::Could not reach rubygems.org to check whether $version is already published."
+            exit 1
+          fi
+
+          case "$status" in
+            200)
+              published=$(jq --arg v "$version" 'any(.[]; .number == $v)' "$body")
+              ;;
+            404)
+              # The gem has never been published, so this version cannot exist yet.
+              published=false
+              ;;
+            *)
+              echo "::error::rubygems.org returned HTTP $status when checking whether $version is already published."
+              exit 1
+              ;;
+          esac
+
+          if [ "$published" != "true" ] && [ "$published" != "false" ]; then
+            echo "::error::Could not determine whether $version is already published on rubygems.org."
+            exit 1
+          fi
+
           echo "version=$version" >> "$GITHUB_OUTPUT"
           echo "published=$published" >> "$GITHUB_OUTPUT"
           echo "scraperwiki-morph $version already published: $published"
@@ -54,4 +85,6 @@ jobs:
 
       - name: Skip release
         if: steps.check.outputs.published != 'false'
-        run: echo "scraperwiki-morph ${{ steps.check.outputs.version }} is already on RubyGems.org; nothing to publish."
+        env:
+          VERSION: ${{ steps.check.outputs.version }}
+        run: echo "scraperwiki-morph $VERSION is already on RubyGems.org; nothing to publish."

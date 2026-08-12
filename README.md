@@ -91,6 +91,9 @@ To release a new version:
 
 The workflow checks RubyGems.org first and skips publishing if the version
 already exists, so re-runs and merges that don't change the version are safe.
+If it can't get an answer from RubyGems.org the job fails rather than skipping
+quietly, so a red Release job may mean the check couldn't reach RubyGems.org
+rather than that publishing failed. Re-run it once the API is reachable again.
 
 ### One-time trusted publishing setup (gem owners)
 
