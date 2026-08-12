@@ -9,12 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Require Ruby 3.3 or later
+- Require Ruby 3.2 or later
 - Bound the scraperwiki dependency to ~> 3.0
 
 ### Added
 
-- GitHub Actions CI testing against Ruby 3.3 and 3.4
+- GitHub Actions CI testing against Ruby 3.2, 3.3 and 3.4
 - SimpleCov coverage reporting and a much expanded spec suite
 - Gem metadata: source code, changelog and bug tracker links, and
   `rubygems_mfa_required`

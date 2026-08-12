@@ -14,7 +14,7 @@ This makes it very easy to transition scraper code from ScraperWiki to
 
 ## Requirements
 
-Ruby 3.3 or later.
+Ruby 3.2 or later.
 
 ## Installation
 
