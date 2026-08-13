@@ -108,8 +108,10 @@ Publishing will fail until a gem owner performs this one-time setup:
    - **Workflow filename**: `release.yml`
    - **Environment**: `rubygems`
 2. On GitHub, in this repository go to **Settings → Environments** and create
-   an environment named `rubygems`. Optionally add protection rules (e.g.
-   required reviewers or restricting deployments to the `main` branch) to
+   an environment named `rubygems`. Under **Deployment branches and tags**,
+   restrict deployments to the `main` branch - the workflow also refuses to
+   run off `main`, but the environment rule enforces it at the platform level.
+   Optionally add further protection rules (e.g. required reviewers) to
    control who can trigger a release.
 
 ## Contributing

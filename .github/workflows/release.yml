@@ -23,6 +23,9 @@ concurrency:
 jobs:
   release:
     name: Publish to RubyGems.org
+    # Trusted publishing scopes to repo + workflow + environment, not branch,
+    # so guard against workflow_dispatch publishing from a non-main ref.
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment: rubygems
     permissions:
@@ -46,7 +49,12 @@ jobs:
         id: check
         shell: bash
         run: |
-          version=$(ruby -r ./lib/scraperwiki-morph/version -e 'puts ScraperWikiMorph::VERSION')
+          set -euo pipefail
+
+          if ! version=$(ruby -r ./lib/scraperwiki-morph/version -e 'puts ScraperWikiMorph::VERSION'); then
+            echo "::error::Could not read ScraperWikiMorph::VERSION from lib/scraperwiki-morph/version.rb."
+            exit 1
+          fi
           body=$(mktemp)
 
           if ! status=$(curl -sS --retry 3 --retry-delay 2 --connect-timeout 10 --max-time 30 \
@@ -58,7 +66,10 @@ jobs:
 
           case "$status" in
             200)
-              published=$(jq --arg v "$version" 'any(.[]; .number == $v)' "$body")
+              if ! published=$(jq --arg v "$version" 'any(.[]; .number == $v)' "$body"); then
+                echo "::error::Could not parse the rubygems.org response when checking whether $version is already published."
+                exit 1
+              fi
               ;;
             404)
               # The gem has never been published, so this version cannot exist yet.
