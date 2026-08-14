@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - GitHub Actions CI testing against Ruby 3.2, 3.3 and 3.4
+- Automated releases to RubyGems.org via trusted publishing when a version
+  bump lands on `main`
 - SimpleCov coverage reporting and a much expanded spec suite
 - Gem metadata: source code, changelog and bug tracker links, and
   `rubygems_mfa_required`

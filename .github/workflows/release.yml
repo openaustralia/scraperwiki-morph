@@ -1,0 +1,101 @@
+name: Release
+
+# Publishes the gem to RubyGems.org via trusted publishing (OIDC) whenever a
+# version bump lands on main. rubygems/release-gem runs `rake release`, which
+# builds the gem, tags the release (vX.Y.Z), pushes the tag and pushes the gem.
+#
+# One-time setup required on rubygems.org and GitHub before this works - see
+# "Releasing a new version" in the README.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - lib/scraperwiki-morph/version.rb
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Publish to RubyGems.org
+    # Trusted publishing scopes to repo + workflow + environment, not branch,
+    # so guard against workflow_dispatch publishing from a non-main ref.
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: rubygems
+    permissions:
+      contents: write # required for `rake release` to push the release tag
+      id-token: write # mandatory for RubyGems trusted publishing
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+
+      # A failed lookup must never be mistaken for "already published" - that
+      # would skip the release silently and, because this workflow only runs on
+      # changes to version.rb, nothing would re-trigger it. Anything other than
+      # a definitive answer fails the job instead.
+      - name: Check whether this version is already on RubyGems.org
+        id: check
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if ! version=$(ruby -r ./lib/scraperwiki-morph/version -e 'puts ScraperWikiMorph::VERSION'); then
+            echo "::error::Could not read ScraperWikiMorph::VERSION from lib/scraperwiki-morph/version.rb."
+            exit 1
+          fi
+          body=$(mktemp)
+
+          if ! status=$(curl -sS --retry 3 --retry-delay 2 --connect-timeout 10 --max-time 30 \
+            -o "$body" -w '%{http_code}' \
+            https://rubygems.org/api/v1/versions/scraperwiki-morph.json); then
+            echo "::error::Could not reach rubygems.org to check whether $version is already published."
+            exit 1
+          fi
+
+          case "$status" in
+            200)
+              if ! published=$(jq --arg v "$version" 'any(.[]; .number == $v)' "$body"); then
+                echo "::error::Could not parse the rubygems.org response when checking whether $version is already published."
+                exit 1
+              fi
+              ;;
+            404)
+              # The gem has never been published, so this version cannot exist yet.
+              published=false
+              ;;
+            *)
+              echo "::error::rubygems.org returned HTTP $status when checking whether $version is already published."
+              exit 1
+              ;;
+          esac
+
+          if [ "$published" != "true" ] && [ "$published" != "false" ]; then
+            echo "::error::Could not determine whether $version is already published on rubygems.org."
+            exit 1
+          fi
+
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "published=$published" >> "$GITHUB_OUTPUT"
+          echo "scraperwiki-morph $version already published: $published"
+
+      - name: Release gem
+        if: steps.check.outputs.published == 'false'
+        uses: rubygems/release-gem@v1
+
+      - name: Skip release
+        if: steps.check.outputs.published != 'false'
+        env:
+          VERSION: ${{ steps.check.outputs.version }}
+        run: echo "scraperwiki-morph $VERSION is already on RubyGems.org; nothing to publish."
