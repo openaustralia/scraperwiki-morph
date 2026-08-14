@@ -3,7 +3,19 @@
 #
 # See https://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 
+require "simplecov"
+SimpleCov.start do
+  skip "/spec/"
+  enable_coverage :branch
+  minimum_coverage 100
+end
+
 require "scraperwiki-morph"
+
+require "webmock/rspec"
+WebMock.disable_net_connect!
+
+require "tmpdir"
 
 RSpec.configure do |config|
   config.run_all_when_everything_filtered = true
@@ -15,6 +27,14 @@ RSpec.configure do |config|
 
   config.mock_with :rspec do |mocks|
     mocks.verify_partial_doubles = true
+  end
+
+  # ScraperWiki memoises its configuration and database connection in module
+  # instance variables. Reset them between examples so each example gets a
+  # clean slate.
+  config.before do
+    ScraperWiki.instance_variable_set(:@config, nil)
+    ScraperWiki.instance_variable_set(:@sqlite_magic_connection, nil)
   end
 
   # Run specs in random order to surface order dependencies. If you find an
