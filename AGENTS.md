@@ -35,7 +35,7 @@ Two consequences:
 
 ## Testing
 
-    bundle exec rspec      # also `rake spec`, and the default rake task
+    bundle exec rspec      # also runs as "rake spec" and the default task
 
 Runs on Ruby 3.2, 3.3 and 3.4 in CI; `.ruby-version` pins 3.2.2 locally.
 
