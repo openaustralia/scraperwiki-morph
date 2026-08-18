@@ -74,10 +74,18 @@ rather than that publishing failed.
 ## Org-level guidance
 
 Workflow, branch naming, commit sign-off, AI disclosure and review conventions
-are org-wide and deliberately not restated here. Fetch them when you need them:
+are org-wide and deliberately not restated here, so there is one copy to keep
+current rather than a stale paraphrase in every repository. They live in
+`openaustralia/.github`:
 
-    gh api repos/openaustralia/.github/contents/.github/CONTRIBUTING.md -H "Accept: application/vnd.github.raw"
-    gh api repos/openaustralia/.github/contents/AGENTS.md -H "Accept: application/vnd.github.raw"
+- [CONTRIBUTING.md](https://github.com/openaustralia/.github/blob/main/.github/CONTRIBUTING.md)
+- [AGENTS.md](https://github.com/openaustralia/.github/blob/main/AGENTS.md)
+
+To read them without leaving the terminal, fetch the raw files with any HTTP
+client. Don't assume a particular tool is installed, the GitHub CLI included:
+
+    https://raw.githubusercontent.com/openaustralia/.github/main/.github/CONTRIBUTING.md
+    https://raw.githubusercontent.com/openaustralia/.github/main/AGENTS.md
 
 This repository has no overrides of that guidance. If one is ever agreed,
 record it here with the reason, so the difference reads as a decision rather
